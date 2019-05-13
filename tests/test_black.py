@@ -1469,17 +1469,17 @@ class BlackTestCase(unittest.TestCase):
     async def test_blackd_request_needs_formatting(self) -> None:
         app = blackd.make_app()
         async with TestClient(TestServer(app)) as client:
-            response = await client.post('/', data=b"print('hello world')")
+            response = await client.post('/', data=b'print("hello world")')
             self.assertEqual(response.status, 200)
             self.assertEqual(response.charset, 'utf8')
-            self.assertEqual(await response.read(), b'print("hello world")\n')
+            self.assertEqual(await response.read(), b"print('hello world')\n")
 
     @unittest.skipUnless(has_blackd_deps, "blackd's dependencies are not installed")
     @async_test
     async def test_blackd_request_no_change(self) -> None:
         app = blackd.make_app()
         async with TestClient(TestServer(app)) as client:
-            response = await client.post('/', data=b'print("hello world")\n')
+            response = await client.post('/', data=b"print('hello world')\n")
             self.assertEqual(response.status, 204)
             self.assertEqual(await response.read(), b'')
 
