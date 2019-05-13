@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.6
 
 name = R'Łukasz'
-F'hello {name}''
+F'hello {name}'
 B'hello'
 
 # output
