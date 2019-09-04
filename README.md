@@ -33,4 +33,3 @@ compromise.
 That being said I will keep this fork up-to-date with black-master because
 I use it in my personal projects, so if you *really*, **really** dislike double
 quotes, *and* want your formatter to normalize strings, feel free to try it!
-
