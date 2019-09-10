@@ -54,8 +54,8 @@ from blib2to3.pgen2.parse import ParseError
 from _version import get_versions
 
 v = get_versions()
-__version__ = v.get("closest-tag", v["version"])
-__git_version__ = v.get("full-revisionid")
+__version__ = v.get('closest-tag', v['version'])
+__git_version__ = v.get('full-revisionid')
 
 DEFAULT_LINE_LENGTH = 88
 DEFAULT_EXCLUDES = (
