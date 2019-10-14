@@ -1325,6 +1325,41 @@ class Line:
 
         return False
 
+    def contains_unsplittable_type_ignore(self) -> bool:
+        if not self.leaves:
+            return False
+
+        # If a 'type: ignore' is attached to the end of a line, we
+        # can't split the line, because we can't know which of the
+        # subexpressions the ignore was meant to apply to.
+        #
+        # We only want this to apply to actual physical lines from the
+        # original source, though: we don't want the presence of a
+        # 'type: ignore' at the end of a multiline expression to
+        # justify pushing it all onto one line. Thus we
+        # (unfortunately) need to check the actual source lines and
+        # only report an unsplittable 'type: ignore' if this line was
+        # one line in the original code.
+
+        # Like in the type comment check above, we need to skip a black added
+        # trailing comma or invisible paren, since it will be the original leaf
+        # before it that has the original line number.
+        last_idx = -1
+        last_leaf = self.leaves[-1]
+        if len(self.leaves) > 2 and (
+            last_leaf.type == token.COMMA
+            or (last_leaf.type == token.RPAR and not last_leaf.value)
+        ):
+            last_idx = -2
+
+        if self.leaves[0].lineno == self.leaves[last_idx].lineno:
+            for node in self.leaves[last_idx:]:
+                for comment in self.comments.get(id(node), []):
+                    if is_type_comment(comment, ' ignore'):
+                        return True
+
+        return False
+
     def contains_multiline_strings(self) -> bool:
         for leaf in self.leaves:
             if is_multiline_string(leaf):
@@ -2332,7 +2367,10 @@ def split_line(
     if (
         not line.contains_uncollapsable_type_comments()
         and not line.should_explode
-        and is_line_short_enough(line, line_length=line_length, line_str=line_str)
+        and (
+            is_line_short_enough(line, line_length=line_length, line_str=line_str)
+            or line.contains_unsplittable_type_ignore()
+        )
     ):
         yield line
         return
@@ -2705,12 +2743,14 @@ def is_import(leaf: Leaf) -> bool:
     )
 
 
-def is_type_comment(leaf: Leaf) -> bool:
+def is_type_comment(leaf: Leaf, suffix: str = '') -> bool:
     """Return True if the given leaf is a special comment.
     Only returns true for type comments for now."""
     t = leaf.type
     v = leaf.value
-    return t in {token.COMMENT, t == STANDALONE_COMMENT} and v.startswith('# type:')
+    return t in {token.COMMENT, t == STANDALONE_COMMENT} and v.startswith(
+        '# type:' + suffix
+    )
 
 
 def normalize_prefix(leaf: Leaf, *, inside_brackets: bool) -> None:
