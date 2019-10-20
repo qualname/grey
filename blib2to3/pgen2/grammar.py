@@ -80,7 +80,7 @@ class Grammar(object):
         self.number2symbol = {}
         self.states = []
         self.dfas = {}
-        self.labels = [(0, "EMPTY")]
+        self.labels = [(0, 'EMPTY')]
         self.keywords = {}
         self.tokens = {}
         self.symbol2label = {}
@@ -90,13 +90,15 @@ class Grammar(object):
 
     def dump(self, filename):
         """Dump the grammar tables to a pickle file."""
-        with tempfile.NamedTemporaryFile(dir=os.path.dirname(filename), delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            dir=os.path.dirname(filename), delete=False
+        ) as f:
             pickle.dump(self.__dict__, f, pickle.HIGHEST_PROTOCOL)
         os.replace(f.name, filename)
 
     def load(self, filename):
         """Load the grammar tables from a pickle file."""
-        with open(filename, "rb") as f:
+        with open(filename, 'rb') as f:
             d = pickle.load(f)
         self.__dict__.update(d)
 
@@ -109,8 +111,14 @@ class Grammar(object):
         Copy the grammar.
         """
         new = self.__class__()
-        for dict_attr in ("symbol2number", "number2symbol", "dfas", "keywords",
-                          "tokens", "symbol2label"):
+        for dict_attr in (
+            'symbol2number',
+            'number2symbol',
+            'dfas',
+            'keywords',
+            'tokens',
+            'symbol2label',
+        ):
             setattr(new, dict_attr, getattr(self, dict_attr).copy())
         new.labels = self.labels[:]
         new.states = self.states[:]
@@ -121,17 +129,18 @@ class Grammar(object):
     def report(self):
         """Dump the grammar tables to standard output, for debugging."""
         from pprint import pprint
-        print("s2n")
+
+        print('s2n')
         pprint(self.symbol2number)
-        print("n2s")
+        print('n2s')
         pprint(self.number2symbol)
-        print("states")
+        print('states')
         pprint(self.states)
-        print("dfas")
+        print('dfas')
         pprint(self.dfas)
-        print("labels")
+        print('labels')
         pprint(self.labels)
-        print("start", self.start)
+        print('start', self.start)
 
 
 # Map from operator to number (since tokenize doesn't do this)

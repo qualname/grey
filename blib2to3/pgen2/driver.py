@@ -11,9 +11,9 @@ This provides a high-level interface to parse a file into a syntax tree.
 
 """
 
-__author__ = "Guido van Rossum <guido@python.org>"
+__author__ = 'Guido van Rossum <guido@python.org>'
 
-__all__ = ["Driver", "load_grammar"]
+__all__ = ['Driver', 'load_grammar']
 
 # Python imports
 import codecs
@@ -28,13 +28,7 @@ from . import grammar, parse, token, tokenize, pgen
 
 
 class Driver(object):
-
-    def __init__(
-        self,
-        grammar,
-        convert=None,
-        logger=None,
-    ):
+    def __init__(self, grammar, convert=None, logger=None):
         self.grammar = grammar
         if logger is None:
             logger = logging.getLogger(__name__)
@@ -50,14 +44,14 @@ class Driver(object):
         column = 0
         indent_columns = []
         type = value = start = end = line_text = None
-        prefix = ""
+        prefix = ''
         for quintuple in tokens:
             type, value, start, end, line_text = quintuple
             if start != (lineno, column):
                 assert (lineno, column) <= start, ((lineno, column), start)
                 s_lineno, s_column = start
                 if lineno < s_lineno:
-                    prefix += "\n" * (s_lineno - lineno)
+                    prefix += '\n' * (s_lineno - lineno)
                     lineno = s_lineno
                     column = 0
                 if column < s_column:
@@ -66,38 +60,38 @@ class Driver(object):
             if type in (tokenize.COMMENT, tokenize.NL):
                 prefix += value
                 lineno, column = end
-                if value.endswith("\n"):
+                if value.endswith('\n'):
                     lineno += 1
                     column = 0
                 continue
             if type == token.OP:
                 type = grammar.opmap[value]
             if debug:
-                self.logger.debug("%s %r (prefix=%r)",
-                                  token.tok_name[type], value, prefix)
+                self.logger.debug(
+                    '%s %r (prefix=%r)', token.tok_name[type], value, prefix
+                )
             if type == token.INDENT:
                 indent_columns.append(len(value))
                 _prefix = prefix + value
-                prefix = ""
-                value = ""
+                prefix = ''
+                value = ''
             elif type == token.DEDENT:
                 _indent_col = indent_columns.pop()
                 prefix, _prefix = self._partially_consume_prefix(prefix, _indent_col)
             if p.addtoken(type, value, (prefix, start)):
                 if debug:
-                    self.logger.debug("Stop.")
+                    self.logger.debug('Stop.')
                 break
-            prefix = ""
+            prefix = ''
             if type in {token.INDENT, token.DEDENT}:
                 prefix = _prefix
             lineno, column = end
-            if value.endswith("\n"):
+            if value.endswith('\n'):
                 lineno += 1
                 column = 0
         else:
             # We never broke out -- EOF is too soon (how can this happen???)
-            raise parse.ParseError("incomplete input",
-                                   type, value, (prefix, start))
+            raise parse.ParseError('incomplete input', type, value, (prefix, start))
         return p.rootnode
 
     def parse_stream_raw(self, stream, debug=False):
@@ -111,20 +105,19 @@ class Driver(object):
 
     def parse_file(self, filename, encoding=None, debug=False):
         """Parse a file and return the syntax tree."""
-        with io.open(filename, "r", encoding=encoding) as stream:
+        with io.open(filename, 'r', encoding=encoding) as stream:
             return self.parse_stream(stream, debug)
 
     def parse_string(self, text, debug=False):
         """Parse a string and return the syntax tree."""
         tokens = tokenize.generate_tokens(
-            io.StringIO(text).readline,
-            grammar=self.grammar
+            io.StringIO(text).readline, grammar=self.grammar
         )
         return self.parse_tokens(tokens, debug)
 
     def _partially_consume_prefix(self, prefix, column):
         lines = []
-        current_line = ""
+        current_line = ''
         current_column = 0
         wait_for_nl = False
         for char in prefix:
@@ -133,10 +126,10 @@ class Driver(object):
                 if char == '\n':
                     if current_line.strip() and current_column < column:
                         res = ''.join(lines)
-                        return res, prefix[len(res):]
+                        return res, prefix[len(res) :]
 
                     lines.append(current_line)
-                    current_line = ""
+                    current_line = ''
                     current_column = 0
                     wait_for_nl = False
             elif char in ' \t':
@@ -152,30 +145,29 @@ class Driver(object):
 
 def _generate_pickle_name(gt, cache_dir=None):
     head, tail = os.path.splitext(gt)
-    if tail == ".txt":
-        tail = ""
-    name = head + tail + ".".join(map(str, sys.version_info)) + ".pickle"
+    if tail == '.txt':
+        tail = ''
+    name = head + tail + '.'.join(map(str, sys.version_info)) + '.pickle'
     if cache_dir:
         return os.path.join(cache_dir, os.path.basename(name))
     else:
         return name
 
 
-def load_grammar(gt="Grammar.txt", gp=None,
-                 save=True, force=False, logger=None):
+def load_grammar(gt='Grammar.txt', gp=None, save=True, force=False, logger=None):
     """Load the grammar (maybe from a pickle)."""
     if logger is None:
         logger = logging.getLogger(__name__)
     gp = _generate_pickle_name(gt) if gp is None else gp
     if force or not _newer(gp, gt):
-        logger.info("Generating grammar tables from %s", gt)
+        logger.info('Generating grammar tables from %s', gt)
         g = pgen.generate_grammar(gt)
         if save:
-            logger.info("Writing grammar tables to %s", gp)
+            logger.info('Writing grammar tables to %s', gp)
             try:
                 g.dump(gp)
             except OSError as e:
-                logger.info("Writing failed: %s", e)
+                logger.info('Writing failed: %s', e)
     else:
         g = grammar.Grammar()
         g.load(gp)
@@ -219,11 +211,11 @@ def main(*args):
     """
     if not args:
         args = sys.argv[1:]
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout,
-                        format='%(message)s')
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout, format='%(message)s')
     for gt in args:
         load_grammar(gt, save=True, force=True)
     return True
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     sys.exit(int(not main()))
