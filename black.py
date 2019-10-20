@@ -2742,9 +2742,7 @@ def is_type_comment(leaf: Leaf, suffix: str = '') -> bool:
     Only returns true for type comments for now."""
     t = leaf.type
     v = leaf.value
-    return t in {token.COMMENT, t == STANDALONE_COMMENT} and v.startswith(
-        '# type:' + suffix
-    )
+    return t in {token.COMMENT, STANDALONE_COMMENT} and v.startswith('# type:' + suffix)
 
 
 def normalize_prefix(leaf: Leaf, *, inside_brackets: bool) -> None:
