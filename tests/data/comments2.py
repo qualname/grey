@@ -59,7 +59,11 @@ else:
 # Comment before function.
 def inline_comments_in_brackets_ruin_everything():
     if typedargslist:
-        parameters.children = [children[0], body, children[-1]]  # (1  # )1
+        parameters.children = [
+            children[0],  # (1
+            body,
+            children[-1]  # )1
+        ]
         parameters.children = [
             children[0],
             body,
@@ -71,11 +75,7 @@ def inline_comments_in_brackets_ruin_everything():
             body,
             parameters.children[-1],  # )2
         ]
-        parameters.children = [
-            parameters.what_if_this_was_actually_long.children[0],
-            body,
-            parameters.children[-1],
-        ]  # type: ignore
+        parameters.children = [parameters.what_if_this_was_actually_long.children[0], body, parameters.children[-1]]  # type: ignore
     if (
         self._proc is not None
         # has the child process finished?
@@ -146,7 +146,10 @@ short
     # let's return
     return Node(
         syms.simple_stmt,
-        [Node(statement, result), Leaf(token.NEWLINE, '\n')],  # FIXME: \r\n?
+        [
+            Node(statement, result),
+            Leaf(token.NEWLINE, '\n')  # FIXME: \r\n?
+        ],
     )
 
 CONFIG_FILES = [CONFIG_FILE, ] + SHARED_CONFIG_FILES + USER_CONFIG_FILES  # type: Final
@@ -313,7 +316,7 @@ short
     )
 
 
-CONFIG_FILES = [CONFIG_FILE] + SHARED_CONFIG_FILES + USER_CONFIG_FILES  # type: Final
+CONFIG_FILES = [CONFIG_FILE,] + SHARED_CONFIG_FILES + USER_CONFIG_FILES  # type: Final
 
 #######################
 ### SECTION COMMENT ###
