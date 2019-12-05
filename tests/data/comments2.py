@@ -12,10 +12,12 @@ __all__ = [
     'Any',
     'Callable',
     'ClassVar',
+
     # ABCs (from collections.abc).
     'AbstractSet',  # collections.abc.Set.
     'ByteString',
     'Container',
+
     # Concrete collection types.
     'Counter',
     'Deque',
@@ -32,8 +34,7 @@ not_shareables = [
     # singletons
     True,
     False,
-    NotImplemented,
-    ...,
+    NotImplemented, ...,
     # builtin types and objects
     type,
     object,
@@ -76,49 +77,42 @@ def inline_comments_in_brackets_ruin_everything():
             parameters.children[-1],  # )2
         ]
         parameters.children = [parameters.what_if_this_was_actually_long.children[0], body, parameters.children[-1]]  # type: ignore
-    if (
-        self._proc is not None
-        # has the child process finished?
-        and self._returncode is None
-        # the child process has finished, but the
-        # transport hasn't been notified yet?
-        and self._proc.poll() is None
-    ):
+    if (self._proc is not None
+            # has the child process finished?
+            and self._returncode is None
+            # the child process has finished, but the
+            # transport hasn't been notified yet?
+            and self._proc.poll() is None):
         pass
     # no newline before or after
     short = [
         # one
         1,
         # two
-        2,
-    ]
+        2]
 
     # no newline after
-    call(
-        arg1,
-        arg2,
-        """
+    call(arg1, arg2, """
 short
-""",
-        arg3=True,
-    )
+""", arg3=True)
 
     ############################################################################
 
     call2(
-        # short
-        arg1,
-        # but
-        arg2,
-        # multiline
-        """
+    # short
+    arg1,
+    # but
+    arg2,
+    # multiline
+    """
 short
 """,
-        # yup
-        arg3=True,
-    )
+    # yup
+    arg3=True)
     lcomp = [
-        element for element in collection if element is not None  # yup  # yup  # right
+        element  # yup
+        for element in collection  # yup
+        if element is not None  # right
     ]
     lcomp2 = [
         # hello
@@ -153,6 +147,12 @@ short
     )
 
 CONFIG_FILES = [CONFIG_FILE, ] + SHARED_CONFIG_FILES + USER_CONFIG_FILES  # type: Final
+
+class Test:
+    def _init_host(self, parsed) -> None:
+        if (parsed.hostname is None or  # type: ignore
+                not parsed.hostname.strip()):
+            pass
 
 #######################
 ### SECTION COMMENT ###
@@ -317,6 +317,13 @@ short
 
 
 CONFIG_FILES = [CONFIG_FILE,] + SHARED_CONFIG_FILES + USER_CONFIG_FILES  # type: Final
+
+
+class Test:
+    def _init_host(self, parsed) -> None:
+        if parsed.hostname is None or not parsed.hostname.strip():  # type: ignore
+            pass
+
 
 #######################
 ### SECTION COMMENT ###
